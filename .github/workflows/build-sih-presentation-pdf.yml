@@ -6,6 +6,11 @@ on:
       - sih-presentation-pack-20260823
     paths:
       - generate_sih_pdf.py
+  pull_request:
+    branches:
+      - main
+    paths:
+      - generate_sih_pdf.py
 
 permissions:
   contents: write
@@ -14,7 +19,7 @@ jobs:
   build-pdf:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out branch
+      - name: Check out isolated branch
         uses: actions/checkout@v4
         with:
           ref: sih-presentation-pack-20260823
