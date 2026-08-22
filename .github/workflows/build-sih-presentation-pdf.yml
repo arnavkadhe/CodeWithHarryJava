@@ -1,0 +1,50 @@
+name: Build SIH Presentation PDF
+
+on:
+  push:
+    branches:
+      - sih-presentation-pack-20260823
+    paths:
+      - generate_sih_pdf.py
+      - fix_and_generate.py
+  pull_request:
+    branches:
+      - main
+    paths:
+      - generate_sih_pdf.py
+      - fix_and_generate.py
+      - .github/workflows/build-sih-presentation-pdf.yml
+
+permissions:
+  contents: write
+
+jobs:
+  build-pdf:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out isolated branch
+        uses: actions/checkout@v4
+        with:
+          ref: sih-presentation-pack-20260823
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install PDF dependency
+        run: python -m pip install --upgrade reportlab
+
+      - name: Generate PDF
+        run: python fix_and_generate.py
+
+      - name: Commit generated PDF to isolated branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add TrustArc_SIH26_Presentation_Script_QA.pdf
+          if ! git diff --cached --quiet; then
+            git commit -m "Generate Swasthya Setu presentation script and Q&A PDF"
+            git push origin HEAD:sih-presentation-pack-20260823
+          fi
